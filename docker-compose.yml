@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  ### Laravel API (backend)
+  laravel:
+    build:
+      context: ./test-cf-api
+      dockerfile: Dockerfile
+    container_name: laravel-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./test-cf-api:/var/www
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=laravel
+      - DB_PASSWORD=secret
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  ### MySQL
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  ### Vite + React frontend
+  frontend:
+    build:
+      context: ./test-cf-reactjs
+      dockerfile: Dockerfile
+    container_name: react-vite-app
+    volumes:
+      - ./test-cf-reactjs:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    working_dir: /app
+    command: npm run dev -- --host
+    depends_on:
+      - laravel
+
+volumes:
+  mysql_data:
+
