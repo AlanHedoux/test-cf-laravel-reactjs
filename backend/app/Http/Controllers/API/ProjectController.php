@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 
 use App\Models\Project;
+use Illuminate\Http\Response;
 
 class ProjectController extends Controller
 {
     /**
      * Display a listing of Project
      *
-     * @return \Illuminate\Http\Response
+     * todo remetre la doc bien au niveau return
      */
-    public function index()
+    public function index()// : ProjectResource
     {
         // @TODO : utiliser les resources Laravel
         // @TODO : implémenter ça dans un service
@@ -22,69 +24,69 @@ class ProjectController extends Controller
         // @TODO : implémenter la recherche
         // @TODO : implémenter le tri
         // @TODO : implémenter la gestion des erreurs
-        // @TODO : Utiliser les Laravel API Resources pour formater la réponse
-        return response([
-            'message' => 'List of projects',
-            'data' => [
-                Project::with('tasks')->get()->map(function ($project) {
-                    return [
-                        'id' => $project->id,
-                        'name' => $project->name,
-                        'tasks' => $project->tasks->map(function ($task) {
-                            return [
-                                'id' => $task->id,
-                                'title' => $task->title,
-                                'status' => $task->status,
-                            ];
-                        }),
-                    ];
-                })
-            ]
-        ]);
+        // @TODO : implémenter les Validations
+        return ProjectResource::collection(
+            Project::with('tasks')
+                ->paginate(5)//@TODO remplacer par une constante de classe
+        );
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created Project
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return ProjectResource
      */
-    public function store(Request $request)
+    public function store(Request $request) : ProjectResource
     {
-        //
+        $data = $request->validate(['name' => 'required|string']);// TODO : créer un validator spécifique?
+        $project = new Project($data);
+        $project->save();
+        return new ProjectResource($project);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified Project.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Project $project
+     * @return ProjectResource
      */
-    public function show($id)
+    public function show(Project $project) : ProjectResource
     {
-        //
+        return new ProjectResource($project->load('tasks'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified Project
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Project $project
+     * @return ProjectResource
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Project $project) : ProjectResource
     {
-        //
+        $data = $request->validate(['name' => 'required|string']);
+        $project->update($data);
+        return new ProjectResource($project);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Project
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Project $project
+     * @return Response
      */
-    public function destroy($id)
+    public function destroy(Project $project) : Response
     {
-        //
+        // delete project and cascade delete associated tasks
+        try {
+            $project->tasks()->each(function ($task) {
+                $task->delete();
+            });
+            $project->delete();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete project and tasks'], 500);
+        }
+        return response()->noContent();
     }
 }

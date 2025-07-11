@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,5 +26,5 @@ Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
 });
 
-Route::get('/projects', [App\Http\Controllers\API\ProjectController::class, 'index'])
-    ->name('projects.index');
+Route::resource('/projects', ProjectController::class);
+Route::resource('/tasks', TaskController::class);
