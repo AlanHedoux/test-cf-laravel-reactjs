@@ -32,6 +32,9 @@ COPY . .
 # Permissions
 RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
+# if needed - to ADD to readme troobleshooting section
+#RUN chown -R www-data:www-data storage bootstrap/cache
+
 # Expose port if needed
 EXPOSE 9000
 
