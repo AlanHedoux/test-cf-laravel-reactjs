@@ -22,3 +22,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/ping', function () {
     return response()->json(['message' => 'pong']);
 });
+
+Route::get('/projects', [App\Http\Controllers\API\ProjectController::class, 'index'])
+    ->name('projects.index');
