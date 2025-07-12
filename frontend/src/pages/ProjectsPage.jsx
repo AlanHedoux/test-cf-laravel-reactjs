@@ -1,5 +1,6 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '@mui/material/Button';
 import Loader from '../components/Loader';
 import ErrorMessage from '../components/ErrorMessage';
@@ -15,54 +16,25 @@ import {
   Paper,
 } from '@mui/material';
 import TablePaginationActions from '../components/TablePaginationActions';
-
-// @TODO à gérer avec react query
-const fetchProjects = async (page = 1) => {
-  // Simulate fetching projects from an API
-  return new Promise((resolve) => {
-    fetch('http://localhost:8080/api/projects?page=' + page)
-      .then((response) => response.json())
-      .then((data) => {
-        resolve(data);
-      })
-      .catch((error) => {
-        console.error('Error fetching projects:', error);
-        resolve({
-          data: [],
-          meta: {
-            current_page: page,
-            last_page: 1,
-            total: 0,
-            per_page: 5,
-          },
-        });
-      });
-  });
-};
+import { fetchProjects } from '../features/projects/projectsSlice';
 
 const ProjectsPage = () => {
-  let navigate = useNavigate();
-  const [projects, setProjects] = useState({});
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0); // DataGrid is 0-based
-  const [error, setError] = useState(null);
+
+  let navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data, meta, loading, error } = useSelector((state) => state.projects);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   useEffect(() => {
-    fetchProjects(page + 1)
-      .then((response) => {
-        setProjects(response);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError('Impossible de récupérer la liste des projets.');
-        setLoading(false);
-      });
-  }, [page]);
+    dispatch(fetchProjects(page + 1));
+    // dans les extra reducers on gère dejà loading et error
+  }, [dispatch, page]); // on dispatch fetchProjects quand on mute le state page
 
+  // à retirer au profit du toast
   if (error) return <ErrorMessage message={error} />;
 
   return (
@@ -94,7 +66,7 @@ const ProjectsPage = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {projects.data.map((row) => {
+                {data.map((row) => {
                   return (
                     <TableRow key={row.name}>
                       <TableCell component="th" scope="row">
@@ -124,8 +96,8 @@ const ProjectsPage = () => {
                   <TablePagination
                     rowsPerPageOptions={[]}
                     colSpan={3}
-                    count={projects.meta.total || 0}
-                    rowsPerPage={projects.meta.per_page || 5}
+                    count={meta.total || 0}
+                    rowsPerPage={meta.per_page || 5}
                     page={page}
                     slotProps={{
                       select: {
@@ -145,10 +117,10 @@ const ProjectsPage = () => {
 
           <div style={{ marginTop: '20px' }}>
             <p>
-              Page {projects.meta ? projects.meta.current_page : 1} sur{' '}
-              {projects.meta ? projects.meta.last_page : 1}
+              Page {meta ? meta.current_page : 1} sur{' '}
+              {meta ? meta.last_page : 1}
             </p>
-            <p>Total de Projets: {projects.meta ? projects.meta.total : 0}</p>
+            <p>Total de Projets: {meta ? meta.total : 0}</p>
           </div>
         </>
       )}
