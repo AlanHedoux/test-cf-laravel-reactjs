@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Loader from '../components/Loader';
@@ -58,7 +58,7 @@ const ProjectsPage = () => {
         setLoading(false);
       })
       .catch((err) => {
-        setError('Failed to fetch projects');
+        setError('Impossible de récupérer la liste des projets.');
         setLoading(false);
       });
   }, [page]);
@@ -72,7 +72,7 @@ const ProjectsPage = () => {
       <Button
         variant="contained"
         onClick={() => {
-          navigate('/projects/create');
+          navigate('/projects/new');
         }}
         style={{ marginBottom: '20px' }}
       >
@@ -86,7 +86,7 @@ const ProjectsPage = () => {
           <TableContainer component={Paper}>
             <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
               <TableHead>
-                <TableRow>
+                <TableRow style={{ backgroundColor: '#e2e2e2ff' }}>
                   <TableCell style={{ width: 90 }}>ID</TableCell>
                   <TableCell style={{ width: 300 }}>Nom du Projet</TableCell>
                   <TableCell style={{ width: 150 }}>Tâches</TableCell>
@@ -95,7 +95,6 @@ const ProjectsPage = () => {
               </TableHead>
               <TableBody>
                 {projects.data.map((row) => {
-                  console.log(row);
                   return (
                     <TableRow key={row.name}>
                       <TableCell component="th" scope="row">
