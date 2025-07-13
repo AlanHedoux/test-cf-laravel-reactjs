@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as api from '../../api/projectsApi';
+import * as tasksApi from '../../api/tasksApi';
 
 export const fetchProjects = createAsyncThunk(
   'projects/fetchProjects',
@@ -16,6 +17,33 @@ export const fetchProjects = createAsyncThunk(
   }
 );
 
+// Thunk pour charger un projet par ID
+export const fetchProjectById = createAsyncThunk(
+  'projects/fetchById',
+  async (projectId) => {
+    console.log('passage fetchProjectById ', projectId);
+    const response = await api.getProjectById(projectId);
+    console.log(response);
+    // gérer les erreur throw dans api.getProjectById
+    return response;
+  }
+);
+
+// thunk pour supprimer une tache
+export const deleteTask = createAsyncThunk(
+  'projects/deleteTask',
+  async ({ projectId, taskId }, { rejectWithValue }) => {
+    try {
+      await tasksApi.deleteTask(taskId);
+      return { projectId, taskId };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || 'Erreur suppression tâche'
+      );
+    }
+  }
+);
+
 const initialState = {
   data: [],
   meta: {
@@ -24,6 +52,7 @@ const initialState = {
     total: 0,
     per_page: 5,
   },
+  current: null,
   loading: false,
   error: null,
 };
@@ -62,7 +91,32 @@ const projectsSlice = createSlice({
       })
       .addCase(fetchProjects.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Erreur inconnue';
+        state.error = action.payload || 'Erreur inconnue (fetchProjects)';
+      })
+      .addCase(fetchProjectById.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProjectById.fulfilled, (state, action) => {
+        console.log('action payload', action.payload);
+        state.current = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchProjectById.rejected, (state, action) => {
+        console.error(action.error);
+        state.loading = false;
+        state.error = action.payload || 'Erreur inconnue (fetchProjectById)';
+      })
+      .addCase(deleteTask.fulfilled, (state, action) => {
+        const newState = state;
+        console.log('passage deleteTask.fulfilled,', newState, action.payload);
+        const { taskId } = action.payload;
+        const project = state.current;
+        if (project && project.tasks) {
+          project.tasks = project.tasks.filter(
+            (task) => task.id !== parseInt(taskId)
+          );
+        }
       });
   },
 });

@@ -26,8 +26,8 @@ export const getAllProjects = async (page) => {
   }
 };
 
-export const getProjectById = async (id) => {
-  const response = await fetch(`${config.apiUrls.projects}/${id}`);
+export const getProjectById = async (projectId) => {
+  const response = await fetch(`${config.apiUrls.projects}/${projectId}`);
 
   if (!response.ok) {
     throw new Error('Erreur lors du chargement du projet');
