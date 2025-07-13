@@ -27,7 +27,7 @@ const AppRouter = () => {
         <Route path="/tasks/new" element={<TaskFormPage />} />
 
         {/* Formulaire de modification de tâche */}
-        <Route path="/tasks/:id/edit" element={<TaskFormPage />} />
+        <Route path="/tasks/:taskId/edit" element={<TaskFormPage />} />
 
         {/* Optionnel : route 404 si aucune correspondance */}
         <Route path="*" element={<h2>Page non trouvée</h2>} />

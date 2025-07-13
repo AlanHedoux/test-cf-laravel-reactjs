@@ -58,16 +58,11 @@ const ProjectDetailPage = () => {
 
   const handleCloseDeleteTask = async () => {
     try {
-      console.log('delete this task : ', id, selectedTaskId);
       await dispatch(
         deleteTask({ projectId: id, taskId: selectedTaskId })
       ).unwrap();
-      //snackThat('Tâche supprimée avec succès', 'success');
-      console.log('tache supprimé');
     } catch (err) {
-      console.error(err);
-      console.error('Erreur lors de la suppression de la tâche', 'error');
-      //snackThat('Erreur lors de la suppression de la tâche', 'error');
+      console.error('Erreur lors de la suppression de la tâche', err);
     } finally {
       handleCloseDialog();
     }
@@ -144,11 +139,11 @@ const ProjectDetailPage = () => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
+          {'Alan H. pour ClubFunding'}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Vous etes sur le point de supprimer une tache, Continuer ?
+            Vous êtes sur le point de supprimer une tache, Continuer ?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

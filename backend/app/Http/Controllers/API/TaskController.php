@@ -28,7 +28,6 @@ class TaskController extends Controller
      */
     public function store(Request $request): TaskResource
     {
-        // @TODO pour le moment non fonctionnel
         $data = $request->validate([
             'project_id' => 'required|exists:projects,id',
             'title' => 'required|string',
@@ -46,9 +45,9 @@ class TaskController extends Controller
      * @param  int  $id
      * @return Response
      */
-    public function show($id)
+    public function show(Task $task): TaskResource
     {
-        //
+        return new TaskResource($task);
     }
 
     /**

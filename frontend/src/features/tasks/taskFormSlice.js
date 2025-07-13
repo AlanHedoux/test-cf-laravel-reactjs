@@ -1,44 +1,44 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as apiForm from '../../api/taskFormApi'; // pour create / update
 import * as api from '../../api/tasksApi'; // pour getById
+import { statusEnum } from '../../constants/statusEnum';
 
 // thunk pour soumettre une tâche (création ou modification)
 export const submitTaskForm = createAsyncThunk(
-  'tasks/submitTaskForm',
-  async (formData, { rejectWithValue, dispatch }) => {
+  'taskForm/submitTaskForm',
+  async (formData, { rejectWithValue }) => {
     try {
       const response = await apiForm.submitTask(formData);
-
-      if (formData.id === null || formData.id === undefined) {
-        dispatch(setTask(response.data));
-      }
-
       return response.data;
     } catch (error) {
       console.error(error);
       return rejectWithValue(
-        error.response?.data ||
-          "Erreur soumission du formulaire de création/modification d'une tache"
+        error.response?.data || 'Erreur lors de la soumission du formulaire'
       );
     }
   }
 );
 
-// thunk pour charger une tâche existante
+// Thunk pour charger une tâche existante
 export const loadTask = createAsyncThunk(
-  'tasks/loadTask',
-  async (id, { rejectWithValue }) => {
+  'taskForm/loadTask',
+  async (taskId, { rejectWithValue }) => {
     try {
-      return await api.getTaskById(id);
-    } catch (err) {
-      return rejectWithValue(err.message || 'Erreur chargement tâche');
+      const data = await api.getTaskById(taskId);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.message || 'Erreur lors du chargement de la tâche'
+      );
     }
   }
 );
 
 const initialState = {
   id: null,
-  name: '',
+  title: '',
+  status: statusEnum.PENDING,
+  projectId: null,
   loading: false,
   success: false,
   error: null,
@@ -48,16 +48,22 @@ const taskFormSlice = createSlice({
   name: 'taskForm',
   initialState,
   reducers: {
-    setName: (state, action) => {
-      state.name = action.payload;
+    setTitle: (state, action) => {
+      state.title = action.payload;
+    },
+    setStatus: (state, action) => {
+      state.status = action.payload;
     },
     setTask: (state, action) => {
       state.id = action.payload.id;
-      state.name = action.payload.name;
+      state.title = action.payload.title;
+      state.projectId = action.payload.project_id;
     },
     resetForm: (state) => {
       state.id = null;
-      state.name = '';
+      state.title = '';
+      state.status = statusEnum.PENDING;
+      state.projectId = null;
       state.loading = false;
       state.success = false;
       state.error = null;
@@ -65,28 +71,36 @@ const taskFormSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // submit
       .addCase(submitTaskForm.pending, (state) => {
         state.loading = true;
         state.success = false;
         state.error = null;
       })
-      .addCase(submitTaskForm.fulfilled, (state) => {
+      .addCase(submitTaskForm.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        state.error = null;
+        state.id = action.payload.id;
+        state.title = action.payload.title;
+        state.projectId = action.payload.project_id;
+        state.status = action.payload.status;
       })
       .addCase(submitTaskForm.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload;
       })
+      // load
       .addCase(loadTask.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(loadTask.fulfilled, (state, action) => {
         state.loading = false;
         state.id = action.payload.id;
-        state.name = action.payload.name;
+        state.title = action.payload.title;
+        state.status = action.payload.status;
+        state.projectId = action.payload.project_id;
       })
       .addCase(loadTask.rejected, (state, action) => {
         state.loading = false;
@@ -95,5 +109,6 @@ const taskFormSlice = createSlice({
   },
 });
 
-export const { setName, resetForm, setTask } = taskFormSlice.actions;
+export const { setTitle, setStatus, setTask, resetForm } =
+  taskFormSlice.actions;
 export default taskFormSlice.reducer;

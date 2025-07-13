@@ -11,12 +11,8 @@ export const submitProjectForm = createAsyncThunk(
     try {
       const response = await apiForm.submitProject(formData);
 
-      //      dispatch(addProject(response.data));
-      // @TODO implémenter updateProject en cas d'update
-      console.log('data dans submitProjectForm', response.data);
-
       if (formData.id === null) {
-        // si on est sur une création on veux maj l'id du state projectForm
+        // si on est sur une création on maj l'id du state projectForm
         dispatch(setProject(response.data));
       }
 
@@ -32,7 +28,6 @@ export const loadProject = createAsyncThunk(
   'projects/loadProject',
   async (id, { rejectWithValue }) => {
     try {
-      console.log('api.getProjectById(id) : ', id);
       return await api.getProjectById(id);
     } catch (err) {
       return rejectWithValue(err.message || 'Erreur chargement projet');

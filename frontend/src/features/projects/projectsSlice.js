@@ -21,10 +21,7 @@ export const fetchProjects = createAsyncThunk(
 export const fetchProjectById = createAsyncThunk(
   'projects/fetchById',
   async (projectId) => {
-    console.log('passage fetchProjectById ', projectId);
     const response = await api.getProjectById(projectId);
-    console.log(response);
-    // gérer les erreur throw dans api.getProjectById
     return response;
   }
 );
@@ -67,7 +64,6 @@ const projectsSlice = createSlice({
     },
     // Mettre à jour un projet dans la liste
     updateProject(state, action) {
-      console.log('updateProject ', action.payload);
       const index = state.data.findIndex((p) => p.id === action.payload.id);
       if (index !== -1) {
         state.data[index] = action.payload;
@@ -98,7 +94,6 @@ const projectsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProjectById.fulfilled, (state, action) => {
-        console.log('action payload', action.payload);
         state.current = action.payload;
         state.loading = false;
       })
@@ -108,8 +103,6 @@ const projectsSlice = createSlice({
         state.error = action.payload || 'Erreur inconnue (fetchProjectById)';
       })
       .addCase(deleteTask.fulfilled, (state, action) => {
-        const newState = state;
-        console.log('passage deleteTask.fulfilled,', newState, action.payload);
         const { taskId } = action.payload;
         const project = state.current;
         if (project && project.tasks) {

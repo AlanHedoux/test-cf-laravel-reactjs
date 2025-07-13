@@ -61,11 +61,10 @@ const ProjectFormPage = () => {
         'Le nom du projet est obligatoire et ne doit contenir que des caractères alphanumériques et des espaces.',
         'error'
       );
-      //return;
+      return;
     }
 
     try {
-      console.log('passage avant dispatch submit');
       const action = await dispatch(submitProjectForm({ id: id, name }));
       const createdOrUpdated = action.payload;
 
@@ -73,7 +72,7 @@ const ProjectFormPage = () => {
 
       setTimeout(() => {
         navigate(`/projects/${createdOrUpdated.id}`); // à la création ça marche pas ça
-      }, 3000);
+      }, 2000);
     } catch (error) {
       console.error('Erreur lors de la création du projet:', error);
       snackThat('Erreur lors de la création du projet : ' + error, 'error');

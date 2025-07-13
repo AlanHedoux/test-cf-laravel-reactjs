@@ -1,25 +1,41 @@
-import { Box, TextField, Button, Snackbar, Alert } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Box,
+  TextField,
+  Button,
+  Snackbar,
+  Alert,
+  Select,
+  InputLabel,
+  MenuItem,
+  FormControl,
+} from '@mui/material';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  setName,
+  setTitle,
   submitTaskForm,
   loadTask,
   resetForm,
+  setStatus,
 } from '../features/tasks/taskFormSlice';
+import { statusEnum } from '../constants/statusEnum';
 
 const TaskFormPage = () => {
-  const params = useParams(); // params.projectId et potentiellement params.taskId
+  const params = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const [severity, setSeverity] = useState('info');
 
-  const { id, name, loading, success, error } = useSelector(
+  const { id, title, projectId, loading, status, success, error } = useSelector(
     (state) => state.taskForm
   );
+
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const projectIdFromUrl = searchParams.get('projectId');
 
   useEffect(() => {
     dispatch(resetForm());
@@ -41,7 +57,7 @@ const TaskFormPage = () => {
   const onCreateClickHandler = async (e) => {
     e.preventDefault();
     const regex = /^[a-zA-Z0-9\s]+$/;
-    if (!regex.test(name)) {
+    if (!regex.test(title)) {
       snackThat(
         'Le nom de la tâche est obligatoire et doit contenir uniquement des caractères alphanumériques et des espaces.',
         'error'
@@ -50,19 +66,23 @@ const TaskFormPage = () => {
     }
 
     try {
-      const action = await dispatch(
+      await dispatch(
         submitTaskForm({
           id,
-          name,
-          projectId: params.projectId,
+          title,
+          status,
+          projectId: projectId ?? projectIdFromUrl,
         })
       );
-      const createdOrUpdated = action.payload;
 
       snackThat('Tâche créée/modifiée avec succès !', 'success');
 
       setTimeout(() => {
-        navigate(`/projects/${params.projectId}`); // ou rediriger vers la liste des tâches
+        navigate(
+          projectIdFromUrl
+            ? `/projects/${projectIdFromUrl}` // mode create task
+            : `/projects/${projectId}` // mode update task
+        );
       }, 2000);
     } catch (error) {
       console.error('Erreur lors de la création de la tâche:', error);
@@ -72,20 +92,16 @@ const TaskFormPage = () => {
 
   return (
     <div>
-      {params.taskId ? (
-        <h1>Modification d'une tâche</h1>
-      ) : (
-        <h1>Création d'une nouvelle tâche</h1>
-      )}
+      <h1>Création/modification d'une tâche</h1>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <TextField
           required
-          id="task-name"
+          id="task-title"
           label="Nom de la tâche"
-          value={name}
+          value={title}
           focused={!!params.taskId}
-          onChange={(e) => dispatch(setName(e.target.value))}
+          onChange={(e) => dispatch(setTitle(e.target.value))}
           sx={{
             width: '400px',
             input: { color: 'white' },
@@ -103,12 +119,33 @@ const TaskFormPage = () => {
             },
           }}
         />
+        <FormControl
+          variant="filled"
+          sx={{ m: 1, minWidth: 120, backgroundColor: 'white' }}
+        >
+          <InputLabel id="status-label">Status</InputLabel>
+          <Select
+            variant="filled"
+            labelId="status-label"
+            id="status-select"
+            value={status}
+            label="Status"
+            onChange={(e) => dispatch(setStatus(e.target.value))}
+          >
+            {Object.values(statusEnum).map((statusValue) => (
+              <MenuItem key={statusValue} value={statusValue}>
+                {statusValue}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         <Button
           variant="contained"
           onClick={onCreateClickHandler}
           disabled={loading}
         >
-          {params.taskId ? 'Modifier' : 'Créer'}
+          Créer/Modifier
         </Button>
       </Box>
 

@@ -34,6 +34,6 @@ export const getProjectById = async (projectId) => {
   }
 
   const res = await response.json();
-  console.log(res.data);
+
   return res.data;
 };
