@@ -7,6 +7,7 @@ use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 
 use App\Models\Project;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class ProjectController extends Controller
@@ -14,20 +15,13 @@ class ProjectController extends Controller
     /**
      * Display a listing of Project
      *
-     * todo remetre la doc bien au niveau return
+     * @return AnonymousResourceCollection
      */
-    public function index()// : ProjectResource
+    public function index(): AnonymousResourceCollection
     {
-        // @TODO : utiliser les resources Laravel
-        // @TODO : implémenter ça dans un service
-        // @TODO : implémenter la pagination
-        // @TODO : implémenter la recherche
-        // @TODO : implémenter le tri
-        // @TODO : implémenter la gestion des erreurs
-        // @TODO : implémenter les Validations
         return ProjectResource::collection(
             Project::with('tasks')
-                ->paginate(5)//@TODO remplacer par une constante de classe
+                ->paginate(5)
         );
     }
 

@@ -3,10 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Enums\StatusEnum;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Task>
+ * @extends Factory<Task>
  */
 class TaskFactory extends Factory
 {
@@ -19,7 +21,7 @@ class TaskFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(),
-            'status' => $this->faker->randomElement(['pending', 'completed']),//@TODO a mettre dans un enum
+            'status' => $this->faker->randomElement(StatusEnum::cases()),
             'project_id' => Project::factory(),
         ];
     }
