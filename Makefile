@@ -16,6 +16,9 @@ migrate:
 migrate-fresh:
 	docker exec -it laravel_app php artisan migrate:fresh
 
+migrate-fresh-seed:
+	docker exec -it laravel_app php artisan migrate:fresh --seed
+
 bash:
 	docker exec -it laravel_app bash
 
