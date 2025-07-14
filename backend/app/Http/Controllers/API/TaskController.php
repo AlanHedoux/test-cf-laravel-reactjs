@@ -11,17 +11,17 @@ use Illuminate\Http\Response;
 class TaskController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of Tasks
      *
      * @return Response
      */
     public function index()
     {
-        //
+        // no need for the moment
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created Task
      *
      * @param Request $request
      * @return TaskResource
@@ -40,7 +40,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified Task.
      *
      * @param  int  $id
      * @return Response
@@ -51,7 +51,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified Task
      *
      * @param Request $request
      * @param Task $task
@@ -68,14 +68,13 @@ class TaskController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Task
      *
      * @param Task $task
      * @return Response
      */
     public function destroy(Task $task): Response
     {
-        // delete task
         try {
             $task->delete();
         } catch (\Exception $e) {
