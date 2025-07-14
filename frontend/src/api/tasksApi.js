@@ -1,9 +1,5 @@
 import config from '../config/config';
 
-export const getAllTasks = async (page) => {
-  return {};
-};
-
 export const getTaskById = async (id) => {
   const response = await fetch(`${config.apiUrls.tasks}/${id}`);
 

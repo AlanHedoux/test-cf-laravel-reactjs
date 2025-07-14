@@ -11,7 +11,7 @@ import {
 } from '../features/projects/projectFormSlice';
 
 const ProjectFormPage = () => {
-  const params = useParams(); // Utilisé pour récupérer l'ID du projet
+  const params = useParams();
   const dispatch = useDispatch();
   let navigate = useNavigate();
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -32,15 +32,7 @@ const ProjectFormPage = () => {
     }
   }, [dispatch, params.id]);
 
-  // useEffect(() => {
-  //   snackThat(error, 'error');
-  // }, [error]);
-
-  // useEffect(() => {
-  //   snackThat('Projec créé avec succés', 'success');
-  // }, [success]);
-
-  // @TODO : set un customHook pour la snackbar ?
+  // Optimisation possible : set un customHook pour la snackbar
   const snackThat = (message, severity) => {
     setSnackMessage(message);
     setOpenSnackbar(true);
@@ -55,7 +47,7 @@ const ProjectFormPage = () => {
   const onCreateClickHandler = async (e) => {
     e.preventDefault();
     // validation par regex
-    const regex = /^[a-zA-Z0-9\s]+$/; // exemple de regex pour valider les caractères alphanumériques et les espaces
+    const regex = /^[a-zA-Z0-9\s]+$/;
     if (!regex.test(name)) {
       snackThat(
         'Le nom du projet est obligatoire et ne doit contenir que des caractères alphanumériques et des espaces.',
@@ -71,7 +63,7 @@ const ProjectFormPage = () => {
       snackThat('Projet créé/modifié avec succès !', 'success');
 
       setTimeout(() => {
-        navigate(`/projects/${createdOrUpdated.id}`); // à la création ça marche pas ça
+        navigate(`/projects/${createdOrUpdated.id}`);
       }, 2000);
     } catch (error) {
       console.error('Erreur lors de la création du projet:', error);

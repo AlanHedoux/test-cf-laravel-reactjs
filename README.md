@@ -16,4 +16,14 @@ make migrate-fresh-seed
 
 (La dernière commande permet d'injecter des seed en bdd grâce à Faker)
 
+### TUs
+
+Pour executer les TestUnitaire il y a 2 commandes, Back et Front
+
+
+```
+make test
+make test-front
+```
+
 ![screen-1.png](screen-1.png)

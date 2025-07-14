@@ -24,3 +24,6 @@ bash:
 
 test:
 	docker exec -it laravel_app php artisan test
+
+test-front:
+	docker exec -it react_app npm run test
